@@ -4,9 +4,10 @@ const os = require("os");
 const path = require("path");
 const { execFileSync, spawn } = require("child_process");
 const asar = require("@electron/asar");
+const { inExe, asset } = require("./asset");
 
 const ROOT = path.join(process.env.LOCALAPPDATA || "", "WisprFlow");
-const CSS = fs.readFileSync(path.join(__dirname, "dark.css"), "utf8");
+const CSS = asset("dark.css", "dark.css");
 const MARK = 'id="wispr-dark-style"';
 const TAG = `<style ${MARK}>${CSS}</style>`;
 const PROBE = path.join(".webpack", "renderer", "hub", "index.html");
@@ -144,8 +145,17 @@ function autoEnabled() {
   try { execFileSync("schtasks", ["/Query", "/TN", TASK], { stdio: "ignore" }); return true; } catch { return false; }
 }
 
+// From the exe, keep a permanent copy so the task still works if the download is moved or deleted.
 function autoEnable(binPath) {
-  const run = `conhost.exe --headless "${process.execPath}" "${binPath}" apply --quiet`;
+  let cmd = `"${process.execPath}" "${binPath}"`;
+  if (inExe) {
+    const dir = path.join(process.env.LOCALAPPDATA, "WisprDark");
+    const copy = path.join(dir, "Wispr-Dark.exe");
+    fs.mkdirSync(dir, { recursive: true });
+    if (path.resolve(process.execPath).toLowerCase() !== copy.toLowerCase()) fs.copyFileSync(process.execPath, copy);
+    cmd = `"${copy}"`;
+  }
+  const run = `conhost.exe --headless ${cmd} apply --quiet`;
   execFileSync("schtasks", ["/Create", "/F", "/TN", TASK, "/SC", "MINUTE", "/MO", "30", "/TR", run], { stdio: "ignore" });
 }
 

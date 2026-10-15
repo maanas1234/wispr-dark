@@ -1,13 +1,13 @@
 // Tiny local web UI. Listens on 127.0.0.1 only; actions need a per-run token so other web pages can't trigger them.
 const http = require("http");
-const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { exec } = require("child_process");
 const core = require("./core");
+const { asset } = require("./asset");
 
 const BIN = path.join(__dirname, "..", "bin", "wispr-dark.js");
-const PAGE = fs.readFileSync(path.join(__dirname, "..", "ui", "index.html"), "utf8");
+const PAGE = asset("index.html", path.join("..", "ui", "index.html"));
 
 function startUi(noOpen) {
   const token = crypto.randomBytes(16).toString("hex");
@@ -43,7 +43,7 @@ function startUi(noOpen) {
   server.listen(0, "127.0.0.1", () => {
     port = server.address().port;
     const url = `http://127.0.0.1:${port}/`;
-    console.log(`Wispr Dark UI: ${url}  (Ctrl+C to quit)`);
+    console.log(`Wispr Dark is open in your browser: ${url}\nKeep this window open while you use it. Close it when you're done.`);
     if (!noOpen) exec(`start "" "${url}"`);
   });
 }

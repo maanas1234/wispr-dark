@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const core = require("../src/core");
 const { startUi } = require("../src/ui");
+const { inExe } = require("../src/asset");
 
 const HELP = `wispr-dark: dark mode for Wispr Flow (Windows)
 
@@ -13,6 +14,7 @@ const HELP = `wispr-dark: dark mode for Wispr Flow (Windows)
 `;
 
 const args = process.argv.slice(2);
+if (inExe && args.length === 0) args.push("ui"); // double-click opens the window
 const flag = (f) => args.includes(f);
 const log = flag("--quiet") ? () => {} : (m) => console.log(m);
 

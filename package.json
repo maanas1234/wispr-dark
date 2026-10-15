@@ -10,6 +10,9 @@
     "src",
     "ui"
   ],
+  "scripts": {
+    "build:exe": "node scripts/build-exe.js"
+  },
   "keywords": [
     "wispr",
     "wispr-flow",
@@ -26,5 +29,9 @@
   },
   "dependencies": {
     "@electron/asar": "^4.3.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "postject": "^1.0.0-alpha.6"
   }
 }
