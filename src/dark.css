@@ -1,0 +1,7 @@
+/* Generic dark theme: invert the page, rotate hue back, re-invert media so it looks normal. */
+html {
+  filter: invert(1) hue-rotate(180deg);
+}
+img, picture, video, canvas, svg image, [style*="background-image"] {
+  filter: invert(1) hue-rotate(180deg);
+}

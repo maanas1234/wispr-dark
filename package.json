@@ -1,0 +1,30 @@
+{
+  "name": "wispr-dark",
+  "version": "0.1.0",
+  "description": "Dark mode for Wispr Flow on Windows, with a one-click UI.",
+  "bin": {
+    "wispr-dark": "bin/wispr-dark.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "ui"
+  ],
+  "keywords": [
+    "wispr",
+    "wispr-flow",
+    "dark-mode",
+    "electron",
+    "windows"
+  ],
+  "license": "MIT",
+  "os": [
+    "win32"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@electron/asar": "^4.3.1"
+  }
+}

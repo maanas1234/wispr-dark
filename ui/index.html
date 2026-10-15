@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wispr Dark</title>
+<style>
+  :root { --bg:#f4f4f1; --card:#fff; --ink:#1b1b1a; --mute:#6b6b66; --line:#e2e2dc; --accent:#1b1b1a; --on-accent:#fff; --ok:#1e7a46; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#141413; --card:#1e1e1c; --ink:#ececE6; --mute:#9a9a92; --line:#33332f; --accent:#ececE6; --on-accent:#141413; --ok:#5cc489; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100vh; display:grid; place-items:center; padding:16px; background:var(--bg); color:var(--ink);
+         font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { width:100%; max-width:440px; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:24px; }
+  h1 { margin:0 0 4px; font-size:22px; }
+  .sub { margin:0 0 20px; color:var(--mute); font-size:14px; }
+  .row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:10px 0; border-top:1px solid var(--line); }
+  .badge { font-size:13px; padding:2px 10px; border-radius:99px; border:1px solid var(--line); color:var(--mute); }
+  .badge.dark { color:var(--ok); border-color:var(--ok); }
+  .btns { display:grid; gap:8px; margin-top:20px; }
+  button { font:inherit; padding:12px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--ink); cursor:pointer; }
+  button.primary { background:var(--accent); color:var(--on-accent); border-color:var(--accent); font-weight:600; }
+  button:disabled { opacity:.5; cursor:wait; }
+  label.toggle { display:flex; justify-content:space-between; align-items:center; margin-top:16px; padding-top:16px; border-top:1px solid var(--line); cursor:pointer; }
+  label.toggle small { display:block; color:var(--mute); font-size:13px; }
+  input[type=checkbox] { width:20px; height:20px; accent-color:var(--accent); }
+  #msg { min-height:1.5em; margin-top:12px; font-size:14px; color:var(--mute); }
+  .note { margin-top:16px; font-size:12px; color:var(--mute); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Wispr Dark</h1>
+  <p class="sub">Dark mode for Wispr Flow</p>
+  <div id="versions"></div>
+  <div class="btns">
+    <button class="primary" id="apply">Make Wispr dark</button>
+    <button id="restore">Restore original look</button>
+  </div>
+  <label class="toggle">
+    <span>Keep it dark after updates<small>Re-applies in the background</small></span>
+    <input type="checkbox" id="auto">
+  </label>
+  <div id="msg" role="status"></div>
+  <p class="note">Applying or restoring closes and reopens Wispr Flow. Unofficial; not affiliated with Wispr.</p>
+</main>
+<script>
+const TOKEN = "__TOKEN__";
+const $ = (id) => document.getElementById(id);
+const busy = (b) => document.querySelectorAll("button, input").forEach((e) => (e.disabled = b));
+
+function render(s) {
+  const v = $("versions");
+  v.replaceChildren();
+  if (!s.versions.length) v.textContent = "Wispr Flow not found.";
+  for (const x of s.versions) {
+    const row = document.createElement("div");
+    row.className = "row";
+    const name = document.createElement("span");
+    name.textContent = "Version " + x.version + (x.running ? " (running)" : "");
+    const badge = document.createElement("span");
+    badge.className = "badge" + (x.patched ? " dark" : "");
+    badge.textContent = x.patched ? "Dark" : "Original";
+    row.append(name, badge);
+    v.append(row);
+  }
+  $("auto").checked = s.auto;
+}
+
+async function call(path, okMsg) {
+  busy(true);
+  $("msg").textContent = "Working... this can take a minute.";
+  try {
+    const r = await fetch(path, { method: "POST", headers: { "x-token": TOKEN } });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || r.status);
+    render(j);
+    $("msg").textContent = okMsg;
+  } catch (e) {
+    $("msg").textContent = "Error: " + e.message;
+  } finally {
+    busy(false);
+  }
+}
+
+$("apply").onclick = () => call("/api/apply", "Done. Wispr Flow is dark.");
+$("restore").onclick = () => call("/api/restore", "Done. Original look restored.");
+$("auto").onchange = (e) => call(e.target.checked ? "/api/auto-on" : "/api/auto-off", e.target.checked ? "Auto re-apply on." : "Auto re-apply off.");
+fetch("/api/status").then((r) => r.json()).then(render);
+</script>
+</body>
+</html>
