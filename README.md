@@ -66,10 +66,10 @@ npm run build:exe               # builds dist/Wispr-Dark.exe
 
 ## Releasing (maintainers)
 
-1. Update `version` in `package.json` and add an entry to `CHANGELOG.md`.
-2. `npm run build:exe`
-3. Create a SHA-256 file: `(Get-FileHash dist/Wispr-Dark.exe).Hash.ToLower() + "  Wispr-Dark.exe" | Set-Content dist/Wispr-Dark.exe.sha256`
-4. Tag and publish: `git tag vX.Y.Z`, push the tag, then `gh release create vX.Y.Z dist/Wispr-Dark.exe dist/Wispr-Dark.exe.sha256 --notes-file CHANGELOG.md`
+1. Update `version` in `package.json` and add an entry to `CHANGELOG.md`, then commit and push.
+2. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+
+The [Release workflow](.github/workflows/release.yml) builds `Wispr-Dark.exe` on GitHub, checks its version matches `package.json`, and attaches it with a `.sha256` file to a new release. Use **Actions, Release, Run workflow** to test a build without making a release.
 
 ## License
 

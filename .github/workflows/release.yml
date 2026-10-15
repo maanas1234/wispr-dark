@@ -1,0 +1,46 @@
+name: Release
+
+# Push a tag like v1.0.1: builds Wispr-Dark.exe and attaches it (with a SHA-256 file) to a GitHub Release.
+# "Run workflow" by hand only builds and uploads the exe as a workflow artifact; it makes no release.
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run build:exe
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          ./dist/Wispr-Dark.exe --version
+          if ((./dist/Wispr-Dark.exe --version) -ne (node -p "require('./package.json').version")) { throw "exe version does not match package.json" }
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $h = (Get-FileHash dist/Wispr-Dark.exe -Algorithm SHA256).Hash.ToLower()
+          "$h  Wispr-Dark.exe" | Out-File -Encoding ascii dist/Wispr-Dark.exe.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Wispr-Dark
+          path: |
+            dist/Wispr-Dark.exe
+            dist/Wispr-Dark.exe.sha256
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" dist/Wispr-Dark.exe dist/Wispr-Dark.exe.sha256 `
+            --title "${{ github.ref_name }}" --notes-file CHANGELOG.md
