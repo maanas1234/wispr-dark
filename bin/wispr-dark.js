@@ -21,6 +21,7 @@ const log = flag("--quiet") ? () => {} : (m) => console.log(m);
 (async () => {
   if (process.platform !== "win32") throw new Error("wispr-dark only supports Windows.");
   switch (args[0]) {
+    case "--version": case "-v": console.log(require("../package.json").version); return;
     case "ui": return startUi(flag("--no-open"));
     case "apply": await core.apply({ restart: flag("--restart"), log }); return;
     case "restore": core.restore({ restart: flag("--restart"), log }); return;

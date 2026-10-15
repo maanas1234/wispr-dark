@@ -22,7 +22,9 @@ function startUi(noOpen) {
     const host = req.headers.host;
     if (host !== `127.0.0.1:${port}` && host !== `localhost:${port}`) return send(res, 403, { error: "bad host" });
     if (req.method === "GET" && req.url === "/") return send(res, 200, PAGE.replace("__TOKEN__", token), "text/html; charset=utf-8");
-    if (req.method === "GET" && req.url === "/api/status") return send(res, 200, state());
+    if (req.method === "GET" && req.url === "/api/status") {
+      try { return send(res, 200, state()); } catch (e) { return send(res, 200, { error: e.message }); }
+    }
     if (req.method === "POST" && req.headers["x-token"] === token) {
       const lines = [];
       const log = (m) => lines.push(m);

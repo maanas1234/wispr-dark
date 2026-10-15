@@ -53,7 +53,11 @@ const busy = (b) => document.querySelectorAll("button, input").forEach((e) => (e
 function render(s) {
   const v = $("versions");
   v.replaceChildren();
-  if (!s.versions.length) v.textContent = "Wispr Flow not found.";
+  if (s.error || !s.versions.length) {
+    v.textContent = "Wispr Flow isn't installed for this Windows user. Install it, open it once, then reload this page.";
+    document.querySelectorAll("button, input").forEach((e) => (e.disabled = true));
+    return;
+  }
   for (const x of s.versions) {
     const row = document.createElement("div");
     row.className = "row";

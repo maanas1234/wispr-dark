@@ -1,7 +1,16 @@
 {
   "name": "wispr-dark",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Dark mode for Wispr Flow on Windows, with a one-click UI.",
+  "author": "Maanas Tyagi",
+  "homepage": "https://github.com/maanas1234/wispr-dark#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maanas1234/wispr-dark.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maanas1234/wispr-dark/issues"
+  },
   "bin": {
     "wispr-dark": "bin/wispr-dark.js"
   },

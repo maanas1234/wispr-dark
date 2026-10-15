@@ -105,39 +105,47 @@ function startWispr() {
 
 // Patch every installed version that isn't patched yet. Running versions are skipped unless restart=true.
 async function apply({ restart = false, log = () => {} } = {}) {
+  const dirs = versions();
   if (restart) quitWispr();
-  const running = runningExes();
-  let changed = 0;
-  for (const dir of versions()) {
-    const name = path.basename(dir);
-    if (isPatched(asarOf(dir))) { log(`${name}: already dark`); continue; }
-    if (isRunning(dir, running)) { log(`${name}: Wispr is running, quit it first (or use restart)`); continue; }
-    log(`${name}: patching...`);
-    await patchOne(dir);
-    log(`${name}: done`);
-    changed++;
+  try {
+    const running = runningExes();
+    let changed = 0;
+    for (const dir of dirs) {
+      const name = path.basename(dir);
+      if (isPatched(asarOf(dir))) { log(`${name}: already dark`); continue; }
+      if (isRunning(dir, running)) { log(`${name}: Wispr is running, quit it first (or use restart)`); continue; }
+      log(`${name}: patching...`);
+      await patchOne(dir);
+      log(`${name}: done`);
+      changed++;
+    }
+    return changed;
+  } finally {
+    if (restart) startWispr();
   }
-  if (restart) startWispr();
-  return changed;
 }
 
 // Put the untouched original app.asar back.
 function restore({ restart = false, log = () => {} } = {}) {
+  const dirs = versions();
   if (restart) quitWispr();
-  const running = runningExes();
-  let changed = 0;
-  for (const dir of versions()) {
-    const name = path.basename(dir);
-    const file = asarOf(dir);
-    if (!isPatched(file)) { log(`${name}: not patched`); continue; }
-    if (!fs.existsSync(file + ".orig")) { log(`${name}: no backup found, skipped`); continue; }
-    if (isRunning(dir, running)) { log(`${name}: Wispr is running, quit it first (or use restart)`); continue; }
-    fs.copyFileSync(file + ".orig", file);
-    log(`${name}: restored`);
-    changed++;
+  try {
+    const running = runningExes();
+    let changed = 0;
+    for (const dir of dirs) {
+      const name = path.basename(dir);
+      const file = asarOf(dir);
+      if (!isPatched(file)) { log(`${name}: not patched`); continue; }
+      if (!fs.existsSync(file + ".orig")) { log(`${name}: no backup found, skipped`); continue; }
+      if (isRunning(dir, running)) { log(`${name}: Wispr is running, quit it first (or use restart)`); continue; }
+      fs.copyFileSync(file + ".orig", file);
+      log(`${name}: restored`);
+      changed++;
+    }
+    return changed;
+  } finally {
+    if (restart) startWispr();
   }
-  if (restart) startWispr();
-  return changed;
 }
 
 // Scheduled task: re-apply after Wispr auto-updates (every 30 min while logged in).
