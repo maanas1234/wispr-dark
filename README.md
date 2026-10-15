@@ -16,6 +16,14 @@ Keep the black window open while you use the page. Close it when you're done.
 
 Windows may say "Windows protected your PC" because the file isn't code-signed. Click **More info**, then **Run anyway**. You can compare the file with the `Wispr-Dark.exe.sha256` checksum on the release page, or build it yourself from source (below).
 
+**Prefer a package manager?** With [Scoop](https://scoop.sh):
+
+```powershell
+scoop install https://raw.githubusercontent.com/maanas1234/wispr-dark/master/scoop/wispr-dark.json
+```
+
+Then run `wispr-dark`, or open **Wispr Dark** from the Start menu.
+
 ### What the buttons do
 
 | Button | What happens |
@@ -70,6 +78,22 @@ npm run build:exe               # builds dist/Wispr-Dark.exe
 2. Tag and push: `git tag vX.Y.Z && git push origin vX.Y.Z`.
 
 The [Release workflow](.github/workflows/release.yml) builds `Wispr-Dark.exe` on GitHub, checks its version matches `package.json`, and attaches it with a `.sha256` file to a new release. Use **Actions, Release, Run workflow** to test a build without making a release.
+
+## Code signing policy
+
+Releases are currently **not code-signed**, which is why Windows shows a warning. Until that changes, check the `.sha256` file on each release, or build from source.
+
+Every release binary is built from this repository's source by the public [Release workflow](.github/workflows/release.yml); nobody uploads a build from their own machine. The executable identifies itself as "Wispr Dark" with the release version in its file properties.
+
+Team roles:
+
+- **Author, reviewer and approver:** [Maanas Tyagi](https://github.com/maanas1234). Each release is built and published only on a tag pushed by the owner.
+
+Wispr Dark only modifies Wispr Flow's own pages (see [How it works](#how-it-works)), adds the optional scheduled task described above, and removes both when you click **Restore original look** and switch off auto mode.
+
+## Privacy
+
+Wispr Dark does not collect, store or send any data, and has no analytics. Its page listens only on your own computer (`127.0.0.1`) and rejects requests from other sites. The only network use is you downloading the exe.
 
 ## License
 

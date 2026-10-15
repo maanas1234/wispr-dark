@@ -36,16 +36,36 @@ fs.writeFileSync(
 );
 
 const run = (cmd, args) => execFileSync(cmd, args, { cwd: dist, stdio: "inherit" });
-run(process.execPath, ["--experimental-sea-config", "sea-config.json"]);
-fs.copyFileSync(process.execPath, exe);
-run(process.execPath, [
-  path.join(root, "node_modules", "postject", "dist", "cli.js"),
-  exe,
-  "NODE_SEA_BLOB",
-  "sea.blob",
-  "--sentinel-fuse",
-  "NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2",
-]);
 
-for (const f of ["bundle.js", "sea-config.json", "sea.blob"]) fs.rmSync(path.join(dist, f));
-console.log(`built ${exe} (${(fs.statSync(exe).size / 1e6).toFixed(0)} MB)`);
+(async () => {
+  const { version } = require("../package.json");
+  run(process.execPath, ["--experimental-sea-config", "sea-config.json"]);
+  fs.copyFileSync(process.execPath, exe);
+
+  // Replace node.exe's "Node.js" identity so the file shows as Wispr Dark in Properties and signing tools.
+  const { rcedit } = await import("rcedit");
+  await rcedit(exe, {
+    "version-string": {
+      ProductName: "Wispr Dark",
+      FileDescription: "Wispr Dark - dark mode for Wispr Flow",
+      CompanyName: "Maanas Tyagi",
+      LegalCopyright: "Copyright (c) 2026 Maanas Tyagi. MIT License.",
+      OriginalFilename: "Wispr-Dark.exe",
+      InternalName: "wispr-dark",
+    },
+    "file-version": `${version}.0`,
+    "product-version": `${version}.0`,
+  });
+
+  run(process.execPath, [
+    path.join(root, "node_modules", "postject", "dist", "cli.js"),
+    exe,
+    "NODE_SEA_BLOB",
+    "sea.blob",
+    "--sentinel-fuse",
+    "NODE_SEA_FUSE_fce680ab2cc467b6e072b8b5df1996b2",
+  ]);
+
+  for (const f of ["bundle.js", "sea-config.json", "sea.blob"]) fs.rmSync(path.join(dist, f));
+  console.log(`built ${exe} (${(fs.statSync(exe).size / 1e6).toFixed(0)} MB)`);
+})().catch((e) => { console.error(e); process.exit(1); });

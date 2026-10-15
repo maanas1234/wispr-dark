@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- The exe now shows "Wispr Dark" and its version in file properties instead of "Node.js".
+- README: code signing policy, privacy statement, and Scoop install option (`scoop/wispr-dark.json`).
+
 ## 1.0.0 - 2026-10-15
 
 First release.

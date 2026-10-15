@@ -1,0 +1,27 @@
+{
+    "version": "1.0.0",
+    "description": "Dark mode for Wispr Flow on Windows, with a one-click window.",
+    "homepage": "https://github.com/maanas1234/wispr-dark",
+    "license": "MIT",
+    "url": "https://github.com/maanas1234/wispr-dark/releases/download/v1.0.0/Wispr-Dark.exe",
+    "hash": "4061265c73829a90e9998c98c07c8b91fe09789dc3f74ddfe0ee18ef7941262c",
+    "bin": [
+        [
+            "Wispr-Dark.exe",
+            "wispr-dark"
+        ]
+    ],
+    "shortcuts": [
+        [
+            "Wispr-Dark.exe",
+            "Wispr Dark"
+        ]
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "url": "https://github.com/maanas1234/wispr-dark/releases/download/v$version/Wispr-Dark.exe",
+        "hash": {
+            "url": "$url.sha256"
+        }
+    }
+}
